@@ -32,7 +32,7 @@ export default function CaptureCard() {
     };
 
     return (
-        <div className="bg-gray-900 rounded-2xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
+        <div className="bg-gray-900 rounded-2xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-7xl mx-auto">
             {/* 🎥 LEFT: Camera + Analysis */}
             <div className="flex flex-col items-center">
                 <h2 className="text-2xl font-bold text-cyan-400 mb-4">📸 Capture & Analyze</h2>

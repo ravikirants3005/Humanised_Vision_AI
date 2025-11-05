@@ -347,7 +347,7 @@ app.get("/stats", async (req, res) => {
           count: { $sum: 1 },
         },
       },
-      { $sort: { count: -1 } },
+      { $sort: { count: -1 } }, 
     ]);
 
     res.json(agg);
