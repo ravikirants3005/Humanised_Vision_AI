@@ -37,7 +37,7 @@ export default function ChatCard() {
     return (
         <div className="bg-gray-800 p-10 rounded-2xl shadow-lg flex flex-col mx-auto h-[500px] w-full max-w-5xl">
             <h2 className="text-xl font-bold text-cyan-400 mb-3 text-center">
-                💬 Chat with Bichiiiiii😘😘
+                💬 Chat with Monk 🫅
             </h2>
 
             <div className="flex-1 overflow-y-auto space-y-3 p-3 bg-gray-900 rounded-lg mb-3">
