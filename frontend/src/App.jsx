@@ -2,6 +2,7 @@ import React from "react";
 import CaptureCard from "./components/CaptureCard";
 // import LiveCard from "./components/LiveCard";
 import DashboardCard from "./components/DashboardCard";
+import ChatCard from "./components/ChatCard";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
 
           <CaptureCard />
           {/* <LiveCard /> */}
+          <ChatCard/>
       </main>
 
       {/* ---------- FOOTER ---------- */}

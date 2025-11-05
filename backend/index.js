@@ -84,14 +84,50 @@ async function fetchWebApi(endpoint, method = "GET", body = null) {
 
 // Emotion → Music mood mapping
 const moodMap = {
-  happy: ["happy", "upbeat", "pop", "dance"],
-  sad: ["sad", "acoustic", "mellow", "soft"],
-  angry: ["metal", "rock", "aggressive", "rap"],
-  surprise: ["electronic", "fun", "edm"],
-  fear: ["chill", "ambient", "soothing"],
-  disgust: ["punk", "alt rock", "grunge"],
-  neutral: ["lofi", "instrumental", "study"],
+  happy: [
+    "Bollywood happy",
+    "Kollywood love",
+    "Tollywood party",
+    "Kannada upbeat",
+  ],
+  sad: [
+    "Bollywood sad",
+    "Tamil melancholy",
+    "Telugu emotional",
+    "Kannada heartbreak",
+  ],
+  angry: [
+    "Bollywood intense",
+    "Tamil mass bgm",
+    "Telugu fight theme",
+    "Kannada power song",
+  ],
+  surprise: [
+    "Bollywood remix",
+    "Tamil peppy",
+    "Telugu dance",
+    "Kannada remix",
+  ],
+  fear: [
+    "Bollywood calm",
+    "Tamil melody",
+    "Telugu slow",
+    "Kannada soothing",
+  ],
+  disgust: [
+    "Bollywood attitude",
+    "Tamil rock",
+    "Telugu attitude",
+    "Kannada fusion",
+  ],
+  neutral: [
+    "Bollywood lofi",
+    "Tamil lofi",
+    "Telugu instrumental",
+    "Kannada chill",
+  ],
 };
+
 
 async function getSongsForEmotion(emotion) {
   try {
@@ -227,6 +263,79 @@ app.get("/top", async (_, res) =>
   )
 );
 
+// 🧠 Conversation memory — stored in RAM
+let chatMemory = [
+  {
+    role: "system",
+    content:
+      "You are a poet for every promt write a 4 line poem",
+  },
+];
+
+app.post("/chat", async (req, res) => {
+  try {
+    const { message, mood, reset } = req.body;
+
+    // Allow user to reset the memory
+    if (reset) {
+      chatMemory = [
+        {
+          role: "system",
+          content:
+            "You are a warm and conversational AI assistant that gives helpful, empathetic responses.",
+        },
+      ];
+      return res.json({ reply: "🧹 Memory reset. Let's start fresh!" });
+    }
+
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    // Add context for emotion
+    const userPrompt = mood
+      ? `The user feels ${mood}. Respond kindly and empathetically.\n\nUser: ${message}`
+      : message;
+
+    console.log("🧠 Chat prompt:", userPrompt);
+
+    // Add user's message to memory
+    chatMemory.push({ role: "user", content: userPrompt });
+
+    // Call Ollama locally
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama3.2:latest",
+        messages: chatMemory, // include full history
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ollama error: ${errorText}`);
+    }
+
+    const data = await response.json();
+    const reply =
+      data.message?.content ||
+      data.messages?.[data.messages.length - 1]?.content ||
+      "I'm not sure what to say.";
+
+    // Save AI reply to memory
+    chatMemory.push({ role: "assistant", content: reply });
+
+    res.json({ reply, memory_length: chatMemory.length });
+  } catch (err) {
+    console.error("❌ Chat route error:", err.message);
+    res
+      .status(500)
+      .json({ error: "Chat request failed", details: err.message });
+  }
+});
+
 // Average confidence and counts per emotion
 app.get("/stats", async (req, res) => {
   try {
@@ -247,7 +356,6 @@ app.get("/stats", async (req, res) => {
     res.status(500).json({ error: "Failed to calculate stats" });
   }
 });
- 
 
 // ---------------- START ----------------
 app.listen(PORT, () =>
